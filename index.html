@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🐍 PyQuest · 蟒境奇兵</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a1a0a;--bg2:#0f2b0f;--bg-ed:#1a1a2e;--bg-card:#132613;--text:#d4e8c8;--text-m:#6b8f6b;--text-c:#e2e8f0;--accent:#4ade80;--accent-h:#22c55e;--accent-g:rgba(74,222,128,.4);--kw:#c084fc;--fn:#60a5fa;--str:#fbbf24;--num:#f472b6;--cmt:#6b7280;--err:#ef4444;--danger:#ef4444;--xp:#a78bfa;--gold:#fbbf24;--hp:#ef4444;--energy:#38bdf8;--ap:#f59e0b;--r:12px;--rs:8px;--fd:'Courier New',monospace;--fb:system-ui,-apple-system,sans-serif;--fc:'Courier New','Consolas',monospace}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--fb)}
+canvas#bgC{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.12}
+.sc{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:1;padding:20px}.sc.on{display:flex}
+#title{background:radial-gradient(ellipse at center,#0f2b0f,#0a1a0a 70%)}
+.tl{font-size:clamp(28px,6vw,56px);font-family:var(--fd);color:var(--accent);text-shadow:0 0 30px var(--accent-g),0 0 60px rgba(74,222,128,.2);margin-bottom:8px;letter-spacing:2px}
+.ts{font-size:clamp(13px,2.5vw,18px);color:var(--text-m);margin-bottom:40px;text-align:center;max-width:500px;line-height:1.6}
+.tsn{font-size:clamp(60px,12vw,100px);margin-bottom:20px;animation:sf 3s ease-in-out infinite}
+@keyframes sf{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-15px) rotate(5deg)}}
+.btn{padding:12px 32px;border:2px solid var(--accent);background:0 0;color:var(--accent);font-size:16px;font-family:var(--fd);border-radius:var(--r);cursor:pointer;transition:all .3s;letter-spacing:1px}.btn:hover{background:var(--accent);color:var(--bg);box-shadow:0 0 20px var(--accent-g);transform:translateY(-2px)}
+.bp{background:var(--accent);color:var(--bg);font-weight:700}.bp:hover{background:var(--accent-h)}
+.bs{padding:7px 16px;font-size:12px}.bd{border-color:var(--danger);color:var(--danger)}.bd:hover{background:var(--danger);color:#fff}
+#map{background:var(--bg);overflow-y:auto;justify-content:flex-start;padding-top:16px}
+.mh{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:700px;padding:8px 20px;margin-bottom:16px}
+.mh h2{font-family:var(--fd);color:var(--accent);font-size:16px}
+.ms{display:flex;gap:14px;font-size:13px;color:var(--text-m)}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:700px;padding:0 20px;margin-bottom:16px}
+.cc{background:var(--bg-card);border:1px solid rgba(74,222,128,.15);border-radius:var(--r);padding:14px;transition:all .3s}.cc.lk{opacity:.35;pointer-events:none}
+.cc h3{font-size:13px;color:var(--accent);margin-bottom:8px;font-family:var(--fd)}
+.ll{display:flex;flex-direction:column;gap:5px}
+.lb{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.1);border-radius:var(--rs);cursor:pointer;color:var(--text);font-size:12px;transition:all .2s}.lb:hover:not(.lk){background:rgba(74,222,128,.15);border-color:var(--accent)}.lb.lk{opacity:.3;cursor:not-allowed}
+.ls{color:var(--gold);font-size:11px}
+.mf{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:8px 20px;width:100%;max-width:700px}
+.ct{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--accent);font-family:var(--fc)}.ct.lk{color:var(--text-m);border-color:rgba(107,143,107,.2);background:rgba(107,143,107,.05)}
+#teach{background:radial-gradient(ellipse at center,#0f2b0f,#0a1a0a 70%)}
+.tb{background:var(--bg-card);border:1px solid rgba(74,222,128,.2);border-radius:var(--r);padding:28px;max-width:520px;width:90%;text-align:center}
+.tb h2{color:var(--accent);font-size:20px;margin-bottom:6px}
+.tt{color:var(--accent);font-size:14px;margin-bottom:16px;font-family:var(--fd)}
+.tc{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin:16px 0}
+.tc .old,.tc .new{background:var(--bg-ed);border-radius:var(--rs);padding:10px;font-family:var(--fc);font-size:12px;text-align:left;line-height:1.7}
+.tc .arr{font-size:24px;color:var(--accent)}.tc .new{border:1px solid var(--accent);box-shadow:0 0 12px var(--accent-g)}
+.tn{color:var(--gold);font-size:13px;margin:8px 0 16px}
+#battle{background:var(--bg);flex-direction:column;justify-content:flex-start;padding:0}
+.bh{display:flex;align-items:center;justify-content:space-between;width:100%;padding:6px 14px;background:rgba(0,0,0,.3);border-bottom:1px solid rgba(74,222,128,.1);flex-shrink:0}
+.bh .ln{font-family:var(--fd);color:var(--accent);font-size:12px}
+.bh-right{display:flex;gap:6px;align-items:center}
+.ap-bar{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--ap);font-family:var(--fd)}
+.ap-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--ap);transition:all .3s}.ap-dot.filled{background:var(--ap);box-shadow:0 0 6px rgba(245,158,11,.5)}.ap-dot.used{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.3)}
+.round-info{font-size:11px;color:var(--text-m);font-family:var(--fd);padding:2px 10px;text-align:center;flex-shrink:0;min-height:18px}
+.intent-bar{font-size:11px;padding:3px 10px;text-align:center;flex-shrink:0;min-height:20px;color:var(--danger);font-family:var(--fd);background:rgba(239,68,68,.05);border-bottom:1px solid rgba(239,68,68,.1)}
+.ba{display:flex;align-items:center;justify-content:space-around;width:100%;padding:8px 16px;flex-shrink:0;position:relative;min-height:140px}
+.fi{display:flex;flex-direction:column;align-items:center;gap:3px;position:relative}
+.fs{width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:42px;position:relative;transition:transform .3s}
+.fs.shake{animation:shk .4s ease}@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.fs.atk-a{animation:atkm .5s ease}@keyframes atkm{0%{transform:translateX(0)}40%{transform:translateX(50px) scale(1.15)}100%{transform:translateX(0)}}
+.fs.def-a{animation:defp .6s ease}@keyframes defp{0%{transform:scale(1)}50%{transform:scale(.85);filter:brightness(1.5)}100%{transform:scale(1)}}
+.fs.heal-a{animation:hlg .8s ease}@keyframes hlg{0%{filter:brightness(1)}50%{filter:brightness(1.8) hue-rotate(60deg)}100%{filter:brightness(1)}}
+.fs.chg-a{animation:chgp .7s ease}@keyframes chgp{0%{transform:scale(1)}50%{transform:scale(1.25);filter:brightness(1.4)}100%{transform:scale(1.15)}}
+.fs.hurt-a{animation:hrtf .4s ease}@keyframes hrtf{0%{filter:brightness(1)}25%{filter:brightness(3) hue-rotate(-30deg)}50%{filter:brightness(.5)}100%{filter:brightness(1)}}
+.fs.eatk{animation:eatk .5s ease}@keyframes eatk{0%{transform:translateX(0)}40%{transform:translateX(-50px) scale(1.15)}100%{transform:translateX(0)}}
+.fn{font-size:11px;color:var(--text-m);font-family:var(--fd)}
+.hbw{width:90px;height:7px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
+.hbf{height:100%;border-radius:4px;transition:width .5s ease}.hbf.p{background:linear-gradient(90deg,var(--accent),#22d3ee)}.hbf.e{background:linear-gradient(90deg,var(--danger),#f97316)}
+.ht{font-size:10px;color:var(--text-m)}
+.fst{display:flex;gap:3px;min-height:16px;flex-wrap:wrap;justify-content:center}
+.si{font-size:9px;padding:1px 4px;background:rgba(255,255,255,.1);border-radius:3px}
+.df{position:absolute;font-family:var(--fd);font-size:18px;font-weight:700;pointer-events:none;z-index:10;animation:dfl 1s ease-out forwards}
+@keyframes dfl{0%{opacity:1;transform:translateY(0) scale(1)}50%{opacity:1;transform:translateY(-25px) scale(1.2)}100%{opacity:0;transform:translateY(-50px) scale(.8)}}
+.df.dm{color:var(--danger)}.df.hl{color:var(--accent)}.df.inf{color:var(--fn);font-size:12px}.df.combo{color:var(--gold);font-size:22px}
+.bvs{font-size:20px;color:var(--accent);opacity:.25;font-family:var(--fd)}
+.ea{flex:1;display:flex;flex-direction:column;width:100%;background:var(--bg-ed);border-top:2px solid rgba(74,222,128,.2);overflow:hidden;min-height:0}
+.et{display:flex;align-items:center;justify-content:space-between;padding:3px 10px;background:rgba(0,0,0,.3);border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.emb{display:flex;gap:3px}
+.mb{padding:3px 10px;font-size:11px;border:1px solid rgba(255,255,255,.15);background:0 0;color:var(--text-m);border-radius:3px;cursor:pointer;transition:all .2s;font-family:var(--fc)}.mb.on{background:rgba(74,222,128,.15);color:var(--accent);border-color:var(--accent)}
+.eh{font-size:10px;color:var(--text-m);max-width:45%;text-align:right;line-height:1.2}
+.be{flex:1;display:none;flex-direction:column;overflow:hidden;min-height:0}.be.on{display:flex}
+.bp2{display:flex;flex-wrap:wrap;gap:4px;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;overflow-x:auto}
+.cb{padding:4px 10px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:5px;color:var(--accent);font-family:var(--fc);font-size:11px;cursor:pointer;user-select:none;white-space:nowrap;transition:all .2s;position:relative}.cb:hover{background:rgba(74,222,128,.2);transform:translateY(-1px)}.cb.kw{background:rgba(192,132,252,.1);border-color:rgba(192,132,252,.25);color:var(--kw)}
+.cb.glow{animation:cbglow 1.5s ease-in-out infinite}@keyframes cbglow{0%,100%{box-shadow:0 0 4px var(--accent-g)}50%{box-shadow:0 0 16px var(--accent-g),0 0 24px rgba(74,222,128,.2)}}
+.bdz{flex:1;padding:6px 10px;overflow-y:auto;min-height:40px;position:relative}
+.bdz-empty{color:var(--text-m);font-size:11px;text-align:center;padding:12px;opacity:.6;font-style:italic}
+.dl{display:flex;align-items:center;gap:4px;padding:3px 6px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.08);border-radius:5px;margin-bottom:3px;min-height:28px;font-family:var(--fc);font-size:12px;color:var(--text-c);transition:all .2s}.dl:hover{border-color:rgba(74,222,128,.3)}
+.dl .lno{color:var(--text-m);font-size:10px;min-width:16px;text-align:right}
+.dl .lc{flex:1}
+.dl .rb{opacity:0;color:var(--danger);cursor:pointer;font-size:12px;padding:0 3px;transition:opacity .2s}.dl:hover .rb{opacity:1}
+.dl.exec{background:rgba(74,222,128,.12)!important;border-color:var(--accent)!important;box-shadow:0 0 8px var(--accent-g)}
+.dl.errl{background:rgba(239,68,68,.1)!important;border-color:var(--danger)!important}
+.te{flex:1;display:none;flex-direction:column;overflow:hidden;min-height:0}.te.on{display:flex}
+.te textarea{flex:1;background:0 0;border:none;color:var(--text-c);font-family:var(--fc);font-size:13px;line-height:1.7;padding:8px 10px;resize:none;outline:none;tab-size:4}.te textarea::placeholder{color:var(--text-m)}
+.eb{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;gap:6px}
+.co{flex:1;font-family:var(--fc);font-size:10px;color:var(--text-m);max-height:32px;overflow-y:auto;line-height:1.3}.co .er{color:var(--err)}.co .ok{color:var(--accent)}
+.eas{display:flex;gap:6px;flex-shrink:0}
+.bex{padding:7px 16px;background:var(--accent);color:var(--bg);font-family:var(--fd);font-size:12px;border:none;border-radius:var(--rs);cursor:pointer;font-weight:700;transition:all .3s;display:flex;align-items:center;gap:4px}.bex:hover{box-shadow:0 0 16px var(--accent-g)}.bex:disabled{opacity:.35;cursor:not-allowed}
+.bcl{padding:6px 12px;background:0 0;border:1px solid rgba(255,255,255,.15);color:var(--text-m);border-radius:var(--rs);cursor:pointer;font-size:11px;transition:all .2s}.bcl:hover{border-color:var(--danger);color:var(--danger)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100;animation:fi .3s ease}.ov.on{display:flex}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.rb2{background:var(--bg-card);border:2px solid var(--accent);border-radius:var(--r);padding:24px 32px;text-align:center;max-width:380px;width:90%;animation:pi .4s ease}
+@keyframes pi{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.rb2.def{border-color:var(--danger)}
+.rb2 h2{font-size:22px;margin-bottom:4px}
+.rm{color:var(--text-m);font-size:12px;margin-bottom:14px;line-height:1.4;font-style:italic}
+.rs2{font-size:28px;margin-bottom:12px;letter-spacing:6px}
+.rw{display:flex;gap:16px;justify-content:center;margin-bottom:16px}
+.rw .rwd{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px}
+.rw .rwd .v{color:var(--accent);font-family:var(--fd);font-size:14px}
+.rbs{display:flex;gap:8px;justify-content:center}
+.lub{background:var(--bg-card);border:2px solid var(--xp);border-radius:var(--r);padding:24px;text-align:center;max-width:360px;width:90%;animation:pi .4s ease}
+.lub h2{color:var(--xp);font-size:20px;margin-bottom:10px}
+.scs{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.sc2{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);border-radius:var(--rs);cursor:pointer;transition:all .2s}.sc2:hover{background:rgba(167,139,250,.15);border-color:var(--xp);transform:translateX(4px)}
+.sc2 .sn{display:flex;align-items:center;gap:6px;font-size:13px}.sc2 .sv{color:var(--xp);font-family:var(--fd);font-size:12px}
+.dov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:90;padding:16px}.dov.on{display:flex}
+.db{background:var(--bg-card);border:1px solid rgba(74,222,128,.2);border-radius:var(--r);padding:16px 20px;max-width:520px;width:100%;animation:su .3s ease;margin-bottom:16px}
+@keyframes su{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.db .ds{color:var(--accent);font-size:11px;font-family:var(--fd);margin-bottom:4px}
+.db .dt{color:var(--text);font-size:13px;line-height:1.5;margin-bottom:10px;white-space:pre-line}
+.db .dbtn{float:right}
+.guide-hl{position:fixed;z-index:201;border-radius:8px;box-shadow:0 0 0 4000px rgba(0,0,0,.6);pointer-events:none;animation:gp 1.5s ease-in-out infinite}
+@keyframes gp{0%,100%{box-shadow:0 0 0 4000px rgba(0,0,0,.6),0 0 8px var(--accent-g)}50%{box-shadow:0 0 0 4000px rgba(0,0,0,.6),0 0 20px var(--accent-g)}}
+.guide-tip{position:fixed;z-index:202;background:var(--bg-card);border:2px solid var(--accent);border-radius:var(--r);padding:12px 16px;color:var(--text);font-size:13px;line-height:1.5;max-width:280px;pointer-events:none;animation:su .3s ease}
+.wow-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:150;flex-direction:column;gap:16px}.wow-ov.on{display:flex}
+.wow-text{color:var(--accent);font-size:16px;font-family:var(--fd);text-align:center;max-width:400px;line-height:1.6;animation:pi .5s ease;white-space:pre-line}
+.wow-emoji{font-size:60px;animation:ws 1s ease}
+@keyframes ws{0%{transform:rotate(0) scale(0)}50%{transform:rotate(360deg) scale(1.3)}100%{transform:rotate(720deg) scale(1)}}
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:0 0}::-webkit-scrollbar-thumb{background:rgba(74,222,128,.2);border-radius:2px}
+@media(max-width:600px){.cg{grid-template-columns:1fr}.ba{min-height:110px;padding:6px 8px}.fs{width:50px;height:50px;font-size:32px}.tc{grid-template-columns:1fr;gap:6px}.tc .arr{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div id="loadMask" style="position:fixed;inset:0;background:#0a1a0a;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:12px"><div style="font-size:48px;animation:sf 2s ease-in-out infinite">🐍</div><div style="color:#4ade80;font-family:monospace;font-size:14px">正在加载蟒境...</div></div>
+<canvas id="bgC"></canvas>
+<div id="title" class="sc on"><div class="tsn">🐍</div><div class="tl">PyQuest</div><div class="ts">蟒境奇兵<br><small style="color:var(--text-m)">你的代码就是你的武器。用 Python 编写指令，操控小蛇「派」战斗！</small></div><div style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="btn bp" onclick="G.start()">🐍 进入蟒境</button><button class="btn bs" onclick="G.cont()" id="contBtn" style="display:none">📂 继续冒险</button></div><div style="position:absolute;bottom:16px;color:var(--text-m);font-size:11px;display:flex;align-items:center;gap:12px"><span>PyQuest v2.0 · 代码即力量</span><button class="btn bs" onclick="G.toggleMute()" id="titleMute" style="font-size:11px;padding:4px 10px">🔊</button></div></div>
+<div id="map" class="sc"><div class="mh"><h2>🗺️ 蟒境地图</h2><div class="ms"><span>🐍 LV.<span id="mLv">1</span></span><span>⚔️<span id="mAt">3</span></span><span>🛡️<span id="mDf">1</span></span><span>⚡<span id="mEn">10</span></span></div></div><div class="cg" id="cGrid"></div><div class="mf" id="cUnlk"></div><div style="padding:12px;text-align:center"><button class="btn bs" onclick="G.show('title')">🏠 返回</button></div></div>
+<div id="teach" class="sc"><div class="tb"><h2>🌟 新代码觉醒！</h2><div class="tt" id="tTi"></div><div class="tc"><div class="old" id="tOld"></div><div class="arr">→</div><div class="new" id="tNew"></div></div><div class="tn" id="tNo"></div><button class="btn bp" onclick="G.closeTeach()">学会了！继续冒险 →</button></div></div>
+<div id="battle" class="sc"><div class="bh"><span class="ln" id="bLn">1-1</span><div class="bh-right"><div class="ap-bar" id="apBar"></div><button class="btn bs" onclick="G.A.T()" id="muteBtn" title="静音" style="font-size:11px">🔊</button><button class="btn bs bd" onclick="G.retreat()" title="撤退">🚪</button></div></div><div class="round-info" id="roundInfo"></div><div class="intent-bar" id="intentBar"></div><div class="ba" id="bAr"><div class="fi" id="pF"><div class="fs" id="pSp">🐍</div><div class="fn">派 LV.<span id="bPl">1</span></div><div class="hbw"><div class="hbf p" id="pHb" style="width:100%"></div></div><div class="ht">❤️ <span id="pHt">100/100</span> ⚡<span id="pEn">10/10</span></div><div class="fst" id="pSt"></div></div><div class="bvs">⚔️</div><div class="fi" id="eF"><div class="fs" id="eSp">👾</div><div class="fn" id="eNm">敌人</div><div class="hbw"><div class="hbf e" id="eHb" style="width:100%"></div></div><div class="ht">❤️ <span id="eHt">50/50</span></div><div class="fst" id="eSt"></div></div></div><div class="ea"><div class="et"><div class="emb"><button class="mb on" onclick="G.mode('block')" id="bmBtn">🧩 积木</button><button class="mb" onclick="G.mode('text')" id="tmBtn">⌨️ 代码</button></div><div class="eh" id="eHi">💡 点击代码块添加</div></div><div class="be on" id="bEd"><div class="bp2" id="bPal"></div><div class="bdz" id="bDz"></div></div><div class="te" id="tEd"><textarea id="cTa" placeholder="# 在这里编写战斗代码&#10;" spellcheck="false"></textarea></div><div class="eb"><div class="co" id="cOut">💻 指令终端就绪</div><div class="eas"><button class="bcl" onclick="G.clr()">🗑️ 清空</button><button class="bex" id="exBtn" onclick="G.exec()">▶️ 释放代码！</button></div></div></div></div>
+<div class="ov" id="vicOv"><div class="rb2"><h2 style="color:var(--accent)">⚔️ 胜利！</h2><div class="rm" id="vicMsg"></div><div class="rs2" id="vicSt"></div><div class="rw"><div class="rwd"><span class="v" id="rwXp">+0</span><span>经验</span></div><div class="rwd"><span class="v" id="rwGd">+0</span><span>金币</span></div></div><div class="rbs"><button class="btn bs" onclick="G.toMap()">🗺️ 地图</button><button class="btn bs bp" onclick="G.nextLv()">➡️ 下一关</button></div></div></div>
+<div class="ov" id="defOv"><div class="rb2 def"><h2 style="color:var(--danger)">💀 代码崩溃…</h2><div class="rm" id="defMsg"></div><div class="rbs"><button class="btn bs" onclick="G.toMap()">🗺️ 地图</button><button class="btn bs bp" onclick="G.retry()">🔄 调试重来</button></div></div></div>
+<div class="ov" id="lvOv"><div class="lub"><h2>🌟 等级提升！</h2><p style="color:var(--text-m);margin-bottom:2px">LV.<span id="nLv">2</span></p><p style="font-size:12px;color:var(--text-m);margin-bottom:12px">选择一项能力提升：</p><div class="scs" id="stCh"></div></div></div>
+<div class="dov" id="dlgOv"><div class="db"><div class="ds" id="dlgSp">🐍 派</div><div class="dt" id="dlgTx"></div><button class="btn bs bp dbtn" onclick="G.closeDlg()">继续 →</button></div></div>
+<div class="wow-ov" id="wowOv"><div class="wow-emoji" id="wowEmoji">🎉</div><div class="wow-text" id="wowText"></div><button class="btn bp" onclick="G.closeWow()" style="margin-top:12px">太酷了！→</button></div>
+<script src="pyquest-engine.js"></script>
+<script src="pyquest-battle.js"></script>
+</body>
+</html>
